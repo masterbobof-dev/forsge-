@@ -1,5 +1,5 @@
 {
-  "name": "copy-of-программа-почти-финал-2",
+  "name": "f-service-tire-shop",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,8 +11,7 @@
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "lucide-react": "^0.555.0",
-    "xlsx": "^0.18.5"
+    "lucide-react": "^0.555.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

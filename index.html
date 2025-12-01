@@ -1,36 +1,594 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://lucide.dev/icons/wrench.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AutoParts Manager</title>
+    <title>Шиномонтаж F - Сервіс</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#2563eb',
-              secondary: '#475569',
-            }
-          }
-        }
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM & Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #09090b; /* Zinc 950 */
+        color: #f4f4f5; /* Zinc 100 */
       }
-    </script>
-  <script type="importmap">
+      .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+      }
+      .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+    </style>
+<script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5"
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-gray-50 text-slate-900 antialiased">
+  <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+    <!-- Main Application Script -->
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect } from 'https://esm.sh/react@18.2.0';
+      import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+      import { 
+        Phone, Menu, X, CreditCard, ShieldCheck, Coins, Coffee, 
+        Wrench, RefreshCw, Flame, CircleDot, Disc, PaintBucket, Layers, Sparkles, 
+        PhoneCall, MapPin, Navigation, ZoomIn, AlertCircle, Car, Truck, ChevronRight, FileCheck
+      } from 'https://esm.sh/lucide-react@0.263.1';
+
+      // --- CONSTANTS ---
+      const PHONE_NUMBER_1 = "099 167 44 24";
+      const PHONE_NUMBER_2 = "063 582 38 58";
+      const PHONE_LINK_1 = "tel:+380991674424";
+      const PHONE_LINK_2 = "tel:+380635823858";
+      const MAP_EMBED_URL = "https://maps.google.com/maps?q=%D0%BC.+%D0%A1%D0%B8%D0%BD%D0%B5%D0%BB%D1%8C%D0%BD%D0%B8%D0%BA%D0%BE%D0%B2%D0%B5,+%D0%B1%D1%83%D0%B4.+9&t=&z=15&ie=UTF8&iwloc=&output=embed";
+      const MAP_DIRECT_LINK = "https://share.google/PQZz6JyQrYR4Vayfv";
+      
+      // Images - Uppercase as requested
+      const HERO_BG_IMAGE = "IMG_4686.JPG";
+      
+      const GALLERY_IMAGES = [
+        { src: "IMG_4686.JPG", alt: "Фасад шиномонтажу Forsage" },
+        { src: "IMG_4697.JPG", alt: "Шиномонтаж та парковка" },
+        { src: "IMG_4699.JPG", alt: "В'їзд та територія" },
+      ];
+
+      const SERVICES = [
+        { id: '1', title: 'Ремонт шин (будь-якої складності)', icon: Wrench },
+        { id: '2', title: 'Перевзування (сезонна заміна)', icon: RefreshCw },
+        { id: '3', title: 'Вулканізація шин', icon: Flame },
+        { id: '4', title: 'Заміна ніпелів', icon: CircleDot },
+        { id: '5', title: 'Зварювання титанових дисків', icon: Disc },
+        { id: '6', title: 'Порошкове фарбування дисків', icon: PaintBucket },
+        { id: '7', title: 'Швидкий ремонт камер', icon: Layers },
+        { id: '8', title: 'Чистка ступиць, змащення керамічною пастою', icon: Sparkles },
+      ];
+
+      const PRICING_DATA_CARS = [
+        { radius: '13-14', removeInstall: '20', balancing: '60', mounting: '60', total1: '160', total4: '640' },
+        { radius: '15', removeInstall: '25', balancing: '65', mounting: '70', total1: '180', total4: '720' },
+        { radius: '16', removeInstall: '35', balancing: '70', mounting: '75', total1: '200', total4: '800' },
+        { radius: '17', removeInstall: '40', balancing: '75', mounting: '80', total1: '220', total4: '880' },
+        { radius: '18', removeInstall: '50', balancing: '80', mounting: '90', total1: '250', total4: '1000' },
+        { radius: '19', removeInstall: '45', balancing: '90', mounting: '95', total1: '260', total4: '1040' },
+        { radius: '20', removeInstall: '50', balancing: '95', mounting: '100', total1: '270', total4: '1080' },
+        { radius: '21', removeInstall: '70', balancing: '100', mounting: '100', total1: '300', total4: '1200' },
+        { radius: 'Позашляховий протектор', removeInstall: '+10', balancing: '+5', mounting: '+10', total1: '+25', total4: '+100', isSurcharge: true },
+      ];
+
+      const PRICING_DATA_SUV = [
+        { radius: '14', removeInstall: '30', balancing: '65', mounting: '60', total1: '180', total4: '720' },
+        { radius: '15', removeInstall: '35', balancing: '65', mounting: '70', total1: '190', total4: '760' },
+        { radius: '16', removeInstall: '40', balancing: '70', mounting: '75', total1: '210', total4: '840' },
+        { radius: '17', removeInstall: '50', balancing: '75', mounting: '80', total1: '225', total4: '900' },
+        { radius: '18', removeInstall: '55', balancing: '90', mounting: '85', total1: '260', total4: '1040' },
+        { radius: '19', removeInstall: '60', balancing: '90', mounting: '95', total1: '270', total4: '1080' },
+        { radius: '20', removeInstall: '65', balancing: '100', mounting: '100', total1: '290', total4: '1160' },
+        { radius: '21', removeInstall: '70', balancing: '110', mounting: '110', total1: '320', total4: '1280' },
+        { radius: 'Позашляховий протектор', removeInstall: '+10', balancing: '+5', mounting: '+10', total1: '+25', total4: '+100', isSurcharge: true },
+      ];
+
+      const ADDITIONAL_SERVICES_DATA = [
+        { name: 'Низький профіль (за 1 колесо)', price: '50 грн' },
+        { name: 'Латка маленька (№3-4)', price: '80 грн' },
+        { name: 'Додаткова вантажопідйомність (C)', price: '25 грн' },
+        { name: 'Балансувальний тягарець (сталь)', price: '20 грн' },
+        { name: 'Вентиль (штуцер) гумовий', price: '40 грн' },
+        { name: 'Вентиль (штуцер) металевий', price: '70 грн' },
+        { name: 'Рихтування (прокат) диска', price: '100 грн + розмір' },
+        { name: 'Підкачка шин', price: '10 грн' },
+        { name: 'Гаряча вулканізація (пластир P10)', price: 'від 350 грн' },
+        { name: 'Холодна вулканізація (вклейка пластиру)', price: '250 грн' },
+        { name: 'Чистка та змащення ступиці', price: '20 грн' },
+        { name: 'Герметизація борту диска', price: '20 грн' },
+        { name: 'Вулканізація камери', price: '150 грн' },
+        { name: 'Вулканізація вентиля (легковий)', price: 'від 250 грн' },
+        { name: 'Вклейка вентиля (легковий)', price: '180 грн' },
+        { name: 'Вулканізація вентиля (вантажний)', price: 'від 350 грн' },
+        { name: 'Вклейка вентиля (вантажний)', price: 'від 280 грн' },
+        { name: 'Швидкий ремонт (шнур)', price: '70 грн' },
+        { name: 'Мопед (зняття колеса - заднє)', price: '200 грн' },
+        { name: 'Мопед (зняття колеса - переднє)', price: '100 грн' },
+      ];
+
+      // --- COMPONENTS ---
+
+      const Logo = ({ onClick }) => (
+        <div 
+          onClick={onClick}
+          className="cursor-pointer group relative flex items-center justify-center w-12 h-12 bg-[#FFC300] rounded-xl transform -skew-x-12 hover:scale-105 transition-transform duration-300 shadow-lg shadow-yellow-900/20"
+        >
+          <span className="text-black font-black text-3xl transform skew-x-12 select-none">F</span>
+        </div>
+      );
+
+      const Header = ({ currentView, onChangeView }) => {
+        const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+        const navItems = [
+          { label: 'Головна', view: 'home' },
+          { label: 'Ціни', view: 'prices' },
+          { label: 'Фотогалерея', view: 'gallery' },
+        ];
+
+        const handleNavClick = (view) => {
+          onChangeView(view);
+          setIsMenuOpen(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        return (
+          <header className="sticky top-0 z-50 w-full bg-black/90 backdrop-blur-md border-b border-white/10 shadow-lg">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+              
+              <div className="flex items-center gap-3 md:gap-4" onClick={() => handleNavClick('home')}>
+                <Logo />
+                <div className="flex flex-col cursor-pointer group">
+                  <span className="font-black text-2xl md:text-3xl tracking-wide text-white italic -skew-x-12 group-hover:text-[#FFC300] transition-colors">
+                    ФОРСАЖ
+                  </span>
+                  <span className="text-[10px] md:text-xs text-zinc-400 font-bold uppercase tracking-[0.2em] leading-none ml-1">
+                    Шиномонтаж
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="hidden lg:flex flex-col items-end gap-0.5 border-r border-zinc-800 pr-6 mr-2">
+                  <a href={PHONE_LINK_1} className="flex items-center gap-2 text-[#FFC300] font-bold text-sm hover:text-[#e6b000] transition-colors group">
+                    <Phone size={14} className="group-hover:animate-bounce" /> {PHONE_NUMBER_1}
+                  </a>
+                  <a href={PHONE_LINK_2} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-white transition-colors">
+                    <Phone size={14} /> {PHONE_NUMBER_2}
+                  </a>
+                </div>
+
+                <nav className="hidden md:flex gap-6">
+                  {navItems.map((item) => (
+                    <button
+                      key={item.view}
+                      onClick={() => handleNavClick(item.view)}
+                      className={`text-sm lg:text-base font-bold uppercase tracking-wide transition-colors hover:text-[#FFC300] ${
+                        currentView === item.view ? 'text-[#FFC300]' : 'text-zinc-300'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+
+                <div className="flex items-center gap-3 md:hidden">
+                  <a href={PHONE_LINK_1} className="w-10 h-10 flex items-center justify-center bg-[#FFC300] rounded-full text-black active:scale-90 transition-transform">
+                    <Phone size={20} />
+                  </a>
+                  <button 
+                    className="text-white p-1 active:scale-90 transition-transform"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  >
+                    {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {isMenuOpen && (
+              <div className="md:hidden absolute top-full left-0 w-full bg-zinc-900 border-b border-white/10 shadow-2xl animate-in slide-in-from-top-2">
+                <div className="bg-black/50 p-4 border-b border-white/5 flex flex-col items-center gap-3">
+                   <a href={PHONE_LINK_1} className="flex items-center gap-2 text-[#FFC300] font-bold text-lg">
+                      <Phone size={18} /> {PHONE_NUMBER_1}
+                   </a>
+                   <a href={PHONE_LINK_2} className="flex items-center gap-2 text-white font-bold text-lg">
+                      <Phone size={18} /> {PHONE_NUMBER_2}
+                   </a>
+                </div>
+                <nav className="flex flex-col p-4 gap-2">
+                  {navItems.map((item) => (
+                    <button
+                      key={item.view}
+                      onClick={() => handleNavClick(item.view)}
+                      className={`text-xl font-black uppercase italic tracking-wider text-left py-3 border-b border-white/5 ${
+                        currentView === item.view ? 'text-[#FFC300]' : 'text-zinc-300'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            )}
+          </header>
+        );
+      };
+
+      const Hero = () => {
+        return (
+          <div className="relative w-full overflow-hidden">
+            <div className="absolute inset-0 z-0">
+              <img 
+                src={HERO_BG_IMAGE}
+                alt="Шиномонтаж Forsage Фасад" 
+                className="w-full h-full object-cover object-center md:object-top opacity-50"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.parentElement.style.backgroundColor = '#18181b';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-[#09090b]"></div>
+            </div>
+
+            <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 md:py-20 flex flex-col gap-8">
+              <div className="space-y-6">
+                {/* MILITARY DISCOUNT BLOCK */}
+                <div className="bg-[#1f2416] border-l-4 border-[#5a6b38] p-6 backdrop-blur-sm rounded-r-lg shadow-[0_0_30px_rgba(90,107,56,0.15)] group hover:bg-[#252b1a] transition-colors">
+                  <div className="flex items-start gap-4">
+                    <ShieldCheck className="text-[#FFC300] w-10 h-10 flex-shrink-0 mt-1" />
+                    <div>
+                      <h2 className="text-3xl md:text-5xl font-black text-[#FFC300] uppercase leading-tight drop-shadow-md tracking-tight">
+                        УВАГА!<br/>УСІМ ВІЙСЬКОВИМ ЗНИЖКА!
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-zinc-800/60 backdrop-blur-md border border-zinc-700 p-5 rounded-xl flex items-center gap-4 hover:border-[#FFC300] transition-colors group">
+                    <div className="p-3 bg-zinc-900 rounded-full group-hover:bg-[#FFC300] transition-colors">
+                      <CreditCard className="text-[#FFC300] w-8 h-8 group-hover:text-black transition-colors" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white uppercase group-hover:text-[#FFC300] transition-colors">
+                      Розрахунок карткою
+                      <span className="block text-sm font-normal text-zinc-400 normal-case mt-1">(термінал працює)</span>
+                    </h3>
+                  </div>
+
+                  <div className="bg-zinc-800/60 backdrop-blur-md border border-zinc-700 p-5 rounded-xl flex items-center gap-4 hover:border-[#FFC300] transition-colors group">
+                    <div className="p-3 bg-zinc-900 rounded-full group-hover:bg-[#FFC300] transition-colors">
+                      <Coins className="text-[#FFC300] w-8 h-8 group-hover:text-black transition-colors" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white uppercase group-hover:text-[#FFC300] transition-colors">
+                      Завжди маємо здачу
+                    </h3>
+                  </div>
+
+                  <div className="bg-zinc-800/60 backdrop-blur-md border border-zinc-700 p-5 rounded-xl flex items-center gap-4 hover:border-[#FFC300] transition-colors group">
+                    <div className="p-3 bg-zinc-900 rounded-full group-hover:bg-[#FFC300] transition-colors">
+                      <Coffee className="text-[#FFC300] w-8 h-8 group-hover:text-black transition-colors" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white uppercase group-hover:text-[#FFC300] transition-colors">
+                      Гаряча кава та чай
+                      <span className="block text-sm font-normal text-zinc-400 normal-case mt-1">(холодні напої)</span>
+                    </h3>
+                  </div>
+
+                   {/* Fixed Prices Block */}
+                  <div className="bg-zinc-800/60 backdrop-blur-md border border-zinc-700 p-5 rounded-xl flex items-center gap-4 hover:border-[#FFC300] transition-colors group">
+                    <div className="p-3 bg-zinc-900 rounded-full group-hover:bg-[#FFC300] transition-colors">
+                      <FileCheck className="text-[#FFC300] w-8 h-8 group-hover:text-black transition-colors" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white uppercase group-hover:text-[#FFC300] transition-colors">
+                      Фіксовані ціни
+                      <span className="block text-sm font-normal text-zinc-400 normal-case mt-1">(на всі послуги)</span>
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const Services = () => (
+        <section className="py-12 bg-[#09090b]">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-white mb-8 border-b-2 border-[#FFC300] inline-block pb-2">
+              Наші Послуги
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {SERVICES.map((service) => (
+                <div key={service.id} className="flex items-center gap-4 p-5 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-[#FFC300] transition-all duration-300 hover:bg-zinc-800 group">
+                  <div className="bg-zinc-950 p-3 rounded-full border border-zinc-800 group-hover:border-[#FFC300] transition-colors">
+                    <service.icon className="w-8 h-8 text-[#FFC300]" />
+                  </div>
+                  <span className="text-xl font-bold text-zinc-100 group-hover:text-white leading-tight">
+                    {service.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+
+      const Contact = () => (
+        <section className="py-12 bg-[#09090b] pb-24">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-white mb-8 border-b-2 border-[#FFC300] inline-block pb-2">
+              Контакти та Адреса
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                 <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+                    <div className="flex items-center gap-3 mb-4 text-zinc-400">
+                      <PhoneCall className="w-5 h-5" />
+                      <span className="uppercase tracking-widest text-sm font-bold">Телефонуйте</span>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <a href={PHONE_LINK_1} className="block w-full">
+                        <button className="w-full py-4 px-6 bg-[#FFC300] hover:bg-[#e6b000] text-black font-black text-2xl rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-3 shadow-lg shadow-yellow-900/20">
+                          <PhoneCall className="w-6 h-6" /> {PHONE_NUMBER_1}
+                        </button>
+                      </a>
+                      <a href={PHONE_LINK_2} className="block w-full">
+                        <button className="w-full py-4 px-6 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-2xl rounded-xl border border-zinc-600 transition-transform active:scale-95 flex items-center justify-center gap-3">
+                          <PhoneCall className="w-6 h-6 text-[#FFC300]" /> {PHONE_NUMBER_2}
+                        </button>
+                      </a>
+                    </div>
+                 </div>
+                 <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+                   <div className="flex items-center gap-3 mb-4 text-zinc-400">
+                      <MapPin className="w-5 h-5" />
+                      <span className="uppercase tracking-widest text-sm font-bold">Навігація</span>
+                   </div>
+                   <a href={MAP_DIRECT_LINK} target="_blank" rel="noopener noreferrer" className="block w-full">
+                      <button className="w-full py-4 px-6 bg-[#FFC300] hover:bg-[#e6b000] text-black font-black text-xl rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-3 animate-pulse">
+                        <Navigation className="w-6 h-6" /> ПРОКЛАСТИ МАРШРУТ
+                      </button>
+                   </a>
+                 </div>
+              </div>
+              <div className="h-[300px] md:h-auto bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-700 relative group">
+                <iframe 
+                  src={MAP_EMBED_URL}
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0, filter: 'grayscale(100%) invert(90%) contrast(85%)' }} 
+                  allowFullScreen={true} 
+                  loading="lazy" 
+                  className="absolute inset-0 w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+
+      const Footer = () => (
+        <footer className="bg-black py-6 border-t border-white/10 text-center">
+          <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} Шиномонтаж F. Всі права захищено.</p>
+        </footer>
+      );
+
+      const Gallery = () => {
+        const [selectedImage, setSelectedImage] = useState(null);
+        return (
+          <div className="min-h-screen bg-[#09090b] py-12 animate-in fade-in duration-500">
+            <div className="max-w-6xl mx-auto px-4">
+              <h2 className="text-3xl md:text-4xl font-black text-white mb-8 border-b-2 border-[#FFC300] inline-block pb-2">
+                Фотогалерея
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {GALLERY_IMAGES.map((img, index) => (
+                  <div key={index} className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 cursor-pointer" onClick={() => setSelectedImage(img.src)}>
+                    <img 
+                      src={img.src} 
+                      alt={img.alt} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                          e.target.parentElement.style.backgroundColor = '#27272a';
+                          e.target.style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="bg-[#FFC300] text-black p-3 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <ZoomIn size={24} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {selectedImage && (
+              <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setSelectedImage(null)}>
+                <button className="absolute top-4 right-4 text-white/70 hover:text-[#FFC300] transition-colors p-2" onClick={() => setSelectedImage(null)}>
+                  <X size={40} />
+                </button>
+                <img src={selectedImage} alt="Full size" className="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain" onClick={(e) => e.stopPropagation()} />
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const PriceTable = ({ title, icon, data }) => (
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-zinc-800 rounded-xl border border-zinc-700">{icon}</div>
+            <h3 className="text-xl md:text-2xl font-bold text-white uppercase italic tracking-wide">{title}</h3>
+          </div>
+          <div className="relative">
+            <div className="md:hidden absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center animate-pulse pointer-events-none border border-white/20">
+              <ChevronRight className="text-white w-5 h-5" />
+            </div>
+            <div className="w-full overflow-x-auto rounded-2xl shadow-xl shadow-black/50 border border-zinc-800 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
+              <table className="w-full text-left border-collapse min-w-[600px] md:min-w-[800px]">
+                <thead>
+                  <tr className="bg-zinc-900 text-white">
+                    <th className="p-3 md:p-6 font-bold uppercase text-xs md:text-sm tracking-wider border-b border-zinc-700 whitespace-nowrap sticky left-0 bg-zinc-900 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.5)]">Радіус (R)</th>
+                    <th className="p-3 md:p-6 font-bold uppercase text-[10px] md:text-xs text-center tracking-wider border-b border-zinc-700 text-zinc-400">Зняття та<br/>Встановлення</th>
+                    <th className="p-3 md:p-6 font-bold uppercase text-[10px] md:text-xs text-center tracking-wider border-b border-zinc-700 text-zinc-400">Балансування</th>
+                    <th className="p-3 md:p-6 font-bold uppercase text-[10px] md:text-xs text-center tracking-wider border-b border-zinc-700 text-zinc-400">Шиномонтаж</th>
+                    <th className="p-3 md:p-6 font-bold uppercase text-xs md:text-sm tracking-wider border-b border-zinc-700 text-[#FFC300] bg-zinc-800/50 min-w-[90px]">Сума<br/><span className="text-[10px] opacity-70 font-normal">за 1 колесо</span></th>
+                    <th className="p-3 md:p-6 font-bold uppercase text-xs md:text-sm tracking-wider border-b border-zinc-700 text-[#FFC300] bg-zinc-800/50 min-w-[90px]">Сума<br/><span className="text-[10px] opacity-70 font-normal">за 4 колеса</span></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800 bg-black/40">
+                  {data.map((row, index) => {
+                    const isSurcharge = row.isSurcharge;
+                    return (
+                      <tr key={index} className={`group transition-colors ${isSurcharge ? 'bg-[#FFC300]/10 hover:bg-[#FFC300]/20' : 'hover:bg-zinc-900'}`}>
+                        <td className={`p-3 md:p-6 font-bold border-r border-zinc-800/50 relative sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.5)] ${isSurcharge ? 'bg-zinc-900/95' : 'bg-[#09090b] group-hover:bg-zinc-900'}`}>
+                          <div className="flex items-center gap-2 md:gap-3">
+                            {!isSurcharge && (
+                              <div className="hidden md:block p-2 bg-zinc-900 rounded-full border border-zinc-700 group-hover:border-[#FFC300] transition-colors">
+                                <Disc className={`w-5 h-5 ${isSurcharge ? 'text-white' : 'text-[#FFC300]'}`} />
+                              </div>
+                            )}
+                            <span className={`${isSurcharge ? "uppercase tracking-wide text-[#FFC300] text-xs md:text-sm whitespace-normal max-w-[120px]" : "text-sm md:text-lg text-white"}`}>
+                              {isSurcharge ? row.radius : `R ${row.radius}`}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-3 md:p-6 text-zinc-300 font-medium text-xs md:text-base text-center">{row.removeInstall}</td>
+                        <td className="p-3 md:p-6 text-zinc-300 font-medium text-xs md:text-base text-center">{row.balancing}</td>
+                        <td className="p-3 md:p-6 text-zinc-300 font-medium text-xs md:text-base text-center">{row.mounting}</td>
+                        <td className="p-3 md:p-6 font-black text-sm md:text-xl text-[#FFC300] bg-zinc-900/30 border-l border-zinc-800/50 whitespace-nowrap">{row.total1} <span className="text-[10px] md:text-xs font-normal text-zinc-500 ml-1">грн</span></td>
+                        <td className="p-3 md:p-6 font-black text-sm md:text-xl text-[#FFC300] bg-zinc-900/30 border-l border-zinc-800/50 shadow-inner whitespace-nowrap">{row.total4} <span className="text-[10px] md:text-xs font-normal text-zinc-500 ml-1">грн</span></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+
+      const AdditionalServicesTable = () => (
+        <div className="mb-12">
+           <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-zinc-800 rounded-xl border border-zinc-700">
+              <Wrench className="text-[#FFC300] w-6 h-6" />
+            </div>
+            <h3 className="text-xl md:text-2xl font-bold text-white uppercase italic tracking-wide">
+              Витратні матеріали та додаткові послуги
+            </h3>
+          </div>
+          
+          <div className="w-full rounded-2xl shadow-xl shadow-black/50 border border-zinc-800 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 bg-zinc-900 text-white border-b border-zinc-700">
+              <div className="p-4 md:p-5 font-bold uppercase tracking-wider text-sm border-b md:border-b-0 border-zinc-800">Послуга</div>
+              <div className="p-4 md:p-5 font-bold uppercase tracking-wider text-sm text-[#FFC300] border-l border-zinc-800 hidden md:block">Вартість</div>
+            </div>
+            <div className="bg-[#09090b] divide-y divide-zinc-800">
+              {ADDITIONAL_SERVICES_DATA.map((item, index) => (
+                 <div key={index} className="grid grid-cols-1 md:grid-cols-2 hover:bg-zinc-900 transition-colors group">
+                    <div className="p-4 md:p-5 text-zinc-200 text-sm md:text-base font-medium flex items-center">
+                       <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 mr-3 group-hover:bg-[#FFC300] transition-colors"></div>
+                       {item.name}
+                    </div>
+                    <div className="px-4 pb-4 md:p-5 flex items-center justify-between md:justify-start md:border-l border-zinc-800/50">
+                       <span className="md:hidden text-zinc-500 text-xs font-bold uppercase tracking-wider">Вартість:</span>
+                       <span className="font-bold text-[#FFC300] text-base md:text-lg">{item.price}</span>
+                    </div>
+                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+
+      const Prices = () => (
+        <div className="min-h-screen bg-[#09090b] py-12 animate-in fade-in duration-500">
+          <div className="max-w-7xl mx-auto px-4">
+             <div className="flex flex-col gap-4 mb-8">
+              <h2 className="text-3xl md:text-4xl font-black text-white border-b-2 border-[#FFC300] inline-block pb-2 self-start">Прайс-лист</h2>
+              
+              <div className="flex flex-col md:flex-row gap-4">
+                 <div className="flex-1 flex items-center gap-3 text-[#FFC300] bg-[#FFC300]/10 p-4 rounded-lg border border-[#FFC300]/20">
+                  <Coins className="w-6 h-6 flex-shrink-0" />
+                  <p className="font-bold uppercase tracking-wide text-sm md:text-base">Всі ціни вказані в гривнях (UAH)</p>
+                </div>
+                
+                <div className="flex-1 flex items-center gap-2 text-zinc-400 bg-zinc-900/50 p-4 rounded-lg border border-zinc-800">
+                  <AlertCircle className="text-[#FFC300] w-6 h-6 flex-shrink-0" />
+                  <p className="text-sm md:text-base">
+                    Прокрутіть таблицю вправо, щоб побачити повну вартість.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <PriceTable title="Легкові Автомобілі" icon={<Car className="text-[#FFC300] w-6 h-6" />} data={PRICING_DATA_CARS} />
+            <div className="my-16 border-t border-dashed border-zinc-800"></div>
+            <PriceTable title="Мікроавтобуси / Кросовери / Позашляховики" icon={<Truck className="text-[#FFC300] w-6 h-6" />} data={PRICING_DATA_SUV} />
+            <div className="my-16 border-t border-dashed border-zinc-800"></div>
+            <AdditionalServicesTable />
+          </div>
+        </div>
+      );
+
+      const App = () => {
+        const [currentView, setCurrentView] = useState('home');
+
+        const renderContent = () => {
+          switch (currentView) {
+            case 'prices': return <Prices />;
+            case 'gallery': return <Gallery />;
+            case 'home':
+            default:
+              return (
+                <>
+                  <Hero />
+                  <Services />
+                  <Contact />
+                </>
+              );
+          }
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col bg-[#09090b] text-white selection:bg-[#FFC300] selection:text-black">
+            <Header currentView={currentView} onChangeView={setCurrentView} />
+            <main className="flex-grow flex flex-col animate-in fade-in duration-500">
+              {renderContent()}
+            </main>
+            <Footer />
+          </div>
+        );
+      };
+
+      const root = createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
 </html>
